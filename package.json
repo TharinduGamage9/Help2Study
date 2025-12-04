@@ -18,7 +18,8 @@
     "add-ba-external": "tsx scripts/addBAExternal.ts",
     "add-grade5": "tsx scripts/addGrade5.ts",
     "add-al-notes": "tsx scripts/addALNotes.ts",
-    "update-al-categories": "tsx scripts/updateALCategories.ts"
+    "update-al-categories": "tsx scripts/updateALCategories.ts",
+    "add-hndit": "tsx scripts/addHNDIT.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

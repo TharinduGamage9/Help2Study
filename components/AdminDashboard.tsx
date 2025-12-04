@@ -55,8 +55,15 @@ interface Grade5Course {
   driveLink: string;
 }
 
+interface HNDITCourse {
+  _id: string;
+  subject: string;
+  driveLink: string;
+  semester: '1st Year 1st Semester' | '1st Year 2nd Semester' | '2nd Year 1st Semester' | '2nd Year 2nd Semester';
+}
+
 export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
-  const [activeTab, setActiveTab] = useState<'notes' | 'otherNotes' | 'nvq' | 'psychology' | 'bcom' | 'languages' | 'baExternal' | 'grade5'>('notes');
+  const [activeTab, setActiveTab] = useState<'notes' | 'otherNotes' | 'nvq' | 'psychology' | 'bcom' | 'languages' | 'baExternal' | 'grade5' | 'hndit'>('notes');
   const [notes, setNotes] = useState<Note[]>([]);
   const [otherNotes, setOtherNotes] = useState<OtherNote[]>([]);
   const [nvqCourses, setNvqCourses] = useState<NVQCourse[]>([]);
@@ -65,9 +72,10 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [languages, setLanguages] = useState<LanguageCourse[]>([]);
   const [baExternalCourses, setBaExternalCourses] = useState<BAExternalCourse[]>([]);
   const [grade5Courses, setGrade5Courses] = useState<Grade5Course[]>([]);
+  const [hnditCourses, setHnditCourses] = useState<HNDITCourse[]>([]);
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [editingItem, setEditingItem] = useState<Note | OtherNote | NVQCourse | PsychologyCourse | BComCourse | LanguageCourse | BAExternalCourse | Grade5Course | null>(null);
+  const [editingItem, setEditingItem] = useState<Note | OtherNote | NVQCourse | PsychologyCourse | BComCourse | LanguageCourse | BAExternalCourse | Grade5Course | HNDITCourse | null>(null);
 
   const [formData, setFormData] = useState({
     subject: '',
@@ -77,6 +85,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     noteCategory: '', // For AL notes category
     year: '1st Year' as '1st Year' | '2nd Year' | '3rd Year' | '4th Year' | 'English Medium',
     medium: '',
+    semester: '1st Year 1st Semester' as '1st Year 1st Semester' | '1st Year 2nd Semester' | '2nd Year 1st Semester' | '2nd Year 2nd Semester',
   });
 
   useEffect(() => {
@@ -88,7 +97,18 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     fetchLanguages();
     fetchBAExternal();
     fetchGrade5();
+    fetchHNDIT();
   }, []);
+
+  const fetchHNDIT = async () => {
+    try {
+      const response = await fetch('/api/hndit');
+      const data = await response.json();
+      setHnditCourses(data.hnditCourses || []);
+    } catch (error) {
+      console.error('Error fetching HND IT courses:', error);
+    }
+  };
 
   const fetchGrade5 = async () => {
     try {
@@ -309,6 +329,25 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           fetchBAExternal();
           resetForm();
         }
+      } else if (activeTab === 'hndit') {
+        const url = editingItem ? `/api/hndit/${editingItem._id}` : '/api/hndit';
+        const method = editingItem ? 'PUT' : 'POST';
+        const body = {
+          subject: formData.subject,
+          driveLink: formData.driveLink,
+          semester: formData.semester,
+        };
+
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+
+        if (response.ok) {
+          fetchHNDIT();
+          resetForm();
+        }
       } else {
         const url = editingItem ? `/api/grade5/${editingItem._id}` : '/api/grade5';
         const method = editingItem ? 'PUT' : 'POST';
@@ -354,6 +393,8 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         url = `/api/languages/${id}`;
       } else if (activeTab === 'baExternal') {
         url = `/api/ba-external/${id}`;
+      } else if (activeTab === 'hndit') {
+        url = `/api/hndit/${id}`;
       } else {
         url = `/api/grade5/${id}`;
       }
@@ -374,6 +415,8 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           fetchLanguages();
         } else if (activeTab === 'baExternal') {
           fetchBAExternal();
+        } else if (activeTab === 'hndit') {
+          fetchHNDIT();
         } else {
           fetchGrade5();
         }
@@ -383,7 +426,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     }
   };
 
-  const handleEdit = (item: Note | OtherNote | NVQCourse | PsychologyCourse | BComCourse | LanguageCourse | BAExternalCourse | Grade5Course) => {
+  const handleEdit = (item: Note | OtherNote | NVQCourse | PsychologyCourse | BComCourse | LanguageCourse | BAExternalCourse | Grade5Course | HNDITCourse) => {
     setEditingItem(item);
     if ('level' in item) {
       setFormData({
@@ -394,6 +437,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         noteCategory: item.category || '',
         year: '1st Year',
         medium: '',
+        semester: '1st Year 1st Semester',
       });
     } else if ('category' in item) {
       setFormData({
@@ -404,6 +448,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         noteCategory: '',
         year: '1st Year',
         medium: '',
+        semester: '1st Year 1st Semester',
       });
     } else if ('year' in item) {
       setFormData({
@@ -414,6 +459,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         noteCategory: '',
         year: item.year,
         medium: '',
+        semester: '1st Year 1st Semester',
       });
     } else if ('medium' in item) {
       setFormData({
@@ -424,6 +470,18 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         noteCategory: '',
         year: '1st Year',
         medium: item.medium,
+        semester: '1st Year 1st Semester',
+      });
+    } else if ('semester' in item) {
+      setFormData({
+        subject: item.subject,
+        driveLink: item.driveLink,
+        level: 'OL',
+        category: '',
+        noteCategory: '',
+        year: '1st Year',
+        medium: '',
+        semester: item.semester,
       });
     } else {
       setFormData({
@@ -434,6 +492,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         noteCategory: '',
         year: '1st Year',
         medium: '',
+        semester: '1st Year 1st Semester',
       });
     }
     setShowForm(true);
@@ -448,6 +507,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
       noteCategory: '',
       year: '1st Year',
       medium: '',
+      semester: '1st Year 1st Semester',
     });
     setEditingItem(null);
     setShowForm(false);
@@ -461,6 +521,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     if (activeTab === 'bcom') return 'B Com Course';
     if (activeTab === 'languages') return 'Language';
     if (activeTab === 'baExternal') return 'BA External Course';
+    if (activeTab === 'hndit') return 'HND IT Course';
     return 'Grade 5 Course';
   };
 
@@ -470,7 +531,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Help2Study - Admin Dashboard</h1>
           <button
             onClick={onLogout}
             className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700"
@@ -585,6 +646,19 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                 }`}
               >
                 Grade 5
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('hndit');
+                  resetForm();
+                }}
+                className={`py-4 px-6 text-sm font-medium border-b-2 ${
+                  activeTab === 'hndit'
+                    ? 'border-indigo-500 text-indigo-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
+                HND IT
               </button>
             </nav>
           </div>
@@ -704,7 +778,25 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                       />
                     </div>
                   )}
-                  <div className={activeTab === 'otherNotes' || activeTab === 'nvq' || activeTab === 'psychology' || activeTab === 'bcom' || activeTab === 'languages' || activeTab === 'baExternal' || activeTab === 'grade5' ? 'md:col-span-2' : ''}>
+                  {activeTab === 'hndit' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Semester
+                      </label>
+                      <select
+                        required
+                        value={formData.semester}
+                        onChange={(e) => setFormData({ ...formData, semester: e.target.value as any })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                      >
+                        <option value="1st Year 1st Semester">1st Year 1st Semester</option>
+                        <option value="1st Year 2nd Semester">1st Year 2nd Semester</option>
+                        <option value="2nd Year 1st Semester">2nd Year 1st Semester</option>
+                        <option value="2nd Year 2nd Semester">2nd Year 2nd Semester</option>
+                      </select>
+                    </div>
+                  )}
+                  <div className={activeTab === 'otherNotes' || activeTab === 'nvq' || activeTab === 'psychology' || activeTab === 'bcom' || activeTab === 'languages' || activeTab === 'baExternal' || activeTab === 'grade5' || activeTab === 'hndit' ? 'md:col-span-2' : ''}>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Drive Link
                     </label>
@@ -977,6 +1069,47 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                             <h3 className="text-lg font-semibold text-gray-900">{course.subject}</h3>
                             <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded">
                               {course.medium}
+                            </span>
+                          </div>
+                          <a
+                            href={course.driveLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-indigo-600 hover:text-indigo-800 text-sm inline-block"
+                          >
+                            View Drive Link {'>'}
+                          </a>
+                        </div>
+                        <div className="flex gap-2 ml-4">
+                          <button
+                            onClick={() => handleEdit(course)}
+                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(course._id)}
+                            className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )
+              ) : activeTab === 'hndit' ? (
+                hnditCourses.length === 0 ? (
+                  <p className="text-gray-500">No HND IT courses found. Add your first HND IT course!</p>
+                ) : (
+                  hnditCourses.map((course) => (
+                    <div key={course._id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex gap-4 items-center mb-2">
+                            <h3 className="text-lg font-semibold text-gray-900">{course.subject}</h3>
+                            <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded">
+                              {course.semester}
                             </span>
                           </div>
                           <a
