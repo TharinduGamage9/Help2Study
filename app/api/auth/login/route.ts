@@ -19,15 +19,14 @@ export async function POST(request: NextRequest) {
     // Try to find admin by username or email
     const admin = await Admin.findOne({
       $or: [
-        { username: username.trim() },
-        { email: username.trim().toLowerCase() }
+        { username: username },
+        { email: username.toLowerCase() }
       ]
     });
 
     if (!admin) {
-      console.error('Admin not found for:', username);
       return NextResponse.json(
-        { error: 'Invalid username or password' },
+        { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
@@ -36,9 +35,8 @@ export async function POST(request: NextRequest) {
     const isPasswordValid = await bcrypt.compare(password, admin.password);
 
     if (!isPasswordValid) {
-      console.error('Invalid password for admin:', admin.username);
       return NextResponse.json(
-        { error: 'Invalid username or password' },
+        { error: 'Invalid credentials' },
         { status: 401 }
       );
     }
@@ -48,9 +46,8 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error: any) {
-    console.error('Login error:', error);
     return NextResponse.json(
-      { error: error.message || 'Server error. Please try again.' },
+      { error: error.message || 'Server error' },
       { status: 500 }
     );
   }

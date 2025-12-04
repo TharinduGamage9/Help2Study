@@ -33,4 +33,3 @@ const BAExternalSchema: Schema = new Schema(
 
 export default mongoose.models.BAExternal || mongoose.model<IBAExternal>('BAExternal', BAExternalSchema);
 
-

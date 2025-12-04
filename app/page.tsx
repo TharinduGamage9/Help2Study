@@ -1,74 +1,21 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect } from 'react';
 
 export default function Home() {
-  useEffect(() => {
-    // Add structured data for SEO
-    const structuredData = {
-      "@context": "https://schema.org",
-      "@type": "EducationalOrganization",
-      "name": "Free Note Platform",
-      "description": "Free study notes, educational materials, and resources for students",
-      "url": typeof window !== 'undefined' ? window.location.origin : "https://freenote.lk",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      },
-      "hasOfferCatalog": {
-        "@type": "OfferCatalog",
-        "name": "Educational Resources",
-        "itemListElement": [
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Course",
-              "name": "Ordinary Level Notes"
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Course",
-              "name": "Advanced Level Notes"
-            }
-          },
-          {
-            "@type": "Offer",
-            "itemOffered": {
-              "@type": "Course",
-              "name": "NVQ Courses"
-            }
-          }
-        ]
-      }
-    };
-
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.text = JSON.stringify(structuredData);
-    document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
-    };
-  }, []);
-
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 sm:py-12 px-4">
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Welcome to Free Note Platform
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+            Welcome to LMS Platform
           </h1>
-          <p className="text-lg sm:text-xl text-gray-600 px-4">
-            Access your notes and study materials for Free
+          <p className="text-xl text-gray-600">
+            Access your notes and study materials for OL and AL levels
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-12 mb-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12 mb-8">
           <Link href="/ol" className="h-full">
             <div className="bg-white rounded-lg shadow-lg p-8 hover:shadow-xl transition-shadow cursor-pointer h-full flex flex-col items-center justify-center">
               <div className="text-center">

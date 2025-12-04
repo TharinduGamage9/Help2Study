@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Note {
   _id: string;
@@ -14,7 +14,11 @@ export default function OLPage() {
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [loading, setLoading] = useState(true);
 
-  const fetchData = useCallback(async () => {
+  useEffect(() => {
+    fetchData();
+  }, [selectedSubject]);
+
+  const fetchData = async () => {
     setLoading(true);
     try {
       const notesUrl = selectedSubject === 'all' 
@@ -30,20 +34,16 @@ export default function OLPage() {
     } finally {
       setLoading(false);
     }
-  }, [selectedSubject]);
-
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  };
 
   const subjects = Array.from(
     new Set(notes.map((n) => n.subject))
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 sm:py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6 sm:mb-8 text-center">
+        <h1 className="text-4xl font-bold text-gray-900 mb-8 text-center">
           Ordinary Level (OL) Materials
         </h1>
 
@@ -54,7 +54,7 @@ export default function OLPage() {
           <select
             value={selectedSubject}
             onChange={(e) => setSelectedSubject(e.target.value)}
-            className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-md bg-white"
+            className="px-4 py-2 border border-gray-300 rounded-md bg-white"
           >
             <option value="all">All Subjects</option>
             {subjects.map((subject) => (
@@ -77,7 +77,7 @@ export default function OLPage() {
                 No notes available for OL level.
               </p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+              <div className="grid md:grid-cols-2 gap-6">
                 {notes.map((note) => (
                   <div
                     key={note._id}

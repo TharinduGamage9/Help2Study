@@ -27,4 +27,3 @@ const PsychologySchema: Schema = new Schema(
 
 export default mongoose.models.Psychology || mongoose.model<IPsychology>('Psychology', PsychologySchema);
 
-

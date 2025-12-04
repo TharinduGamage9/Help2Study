@@ -1,96 +1,10 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
-import VisitTracker from '@/components/VisitTracker'
-
-// Get site URL - use Vercel URL if available, otherwise fallback
-const getSiteUrl = () => {
-  if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL;
-  }
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
-  return 'https://freenote.lk';
-};
-
-const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: 'Free Note Platform - Free Study Notes & Educational Resources',
-    template: '%s | Free Note Platform'
-  },
-  description: 'Access free study notes, educational materials, and resources for OL, AL, NVQ, B.Com, Psychology, Languages, BA External, and Grade 5. Download notes, past papers, and study materials for free.',
-  keywords: [
-    'free notes',
-    'study notes',
-    'educational resources',
-    'OL notes',
-    'AL notes',
-    'Ordinary Level',
-    'Advanced Level',
-    'NVQ courses',
-    'B.Com notes',
-    'psychology notes',
-    'language learning',
-    'BA External',
-    'Grade 5 notes',
-    'free study materials',
-    'Sri Lanka education',
-    'download notes',
-    'past papers',
-    'study resources'
-  ],
-  authors: [{ name: 'Free Note Platform' }],
-  creator: 'Free Note Platform',
-  publisher: 'Free Note Platform',
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: siteUrl,
-    siteName: 'Free Note Platform',
-    title: 'Free Note Platform - Free Study Notes & Educational Resources',
-    description: 'Access free study notes, educational materials, and resources for OL, AL, NVQ, B.Com, Psychology, Languages, BA External, and Grade 5.',
-    images: [
-      {
-        url: '/og-image.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'Free Note Platform',
-      },
-    ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Free Note Platform - Free Study Notes & Educational Resources',
-    description: 'Access free study notes, educational materials, and resources for OL, AL, NVQ, B.Com, Psychology, Languages, BA External, and Grade 5.',
-    images: ['/og-image.jpg'],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
-  verification: {
-    google: process.env.GOOGLE_SITE_VERIFICATION || undefined,
-  },
-  alternates: {
-    canonical: siteUrl,
-  },
+  title: 'LMS Platform',
+  description: 'Learning Management System Platform',
 }
 
 export default function RootLayout({
@@ -100,18 +14,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-        <meta name="theme-color" content="#4F46E5" />
-        <link rel="canonical" href={siteUrl} />
-      </head>
-      <body className="flex flex-col min-h-screen">
+      <body>
         <Navbar />
-        <VisitTracker />
-        <main className="flex-grow">
-          {children}
-        </main>
-        <Footer />
+        {children}
       </body>
     </html>
   )

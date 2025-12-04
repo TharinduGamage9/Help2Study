@@ -22,33 +22,19 @@ export default function AdminPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          username: username.trim(), 
-          password: password 
-        }),
+        body: JSON.stringify({ username, password }),
       });
 
-      let data;
-      try {
-        data = await response.json();
-      } catch (jsonError) {
-        const text = await response.text();
-        console.error('Failed to parse JSON:', text);
-        setError('Server error. Please try again.');
-        setLoading(false);
-        return;
-      }
+      const data = await response.json();
 
       if (response.ok) {
         setIsAuthenticated(true);
         localStorage.setItem('adminAuth', 'true');
       } else {
-        setError(data.error || 'Login failed. Please check your credentials.');
-        console.error('Login error:', data);
+        setError(data.error || 'Login failed');
       }
-    } catch (err: any) {
-      console.error('Login error:', err);
-      setError('An error occurred. Please check your connection and try again.');
+    } catch (err) {
+      setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -84,12 +70,6 @@ export default function AdminPage() {
                 {error}
               </div>
             )}
-            
-            <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded text-sm">
-              <strong>Default Credentials:</strong><br />
-              Username: <code>admin</code> or <code>admin@lms.com</code><br />
-              Password: <code>admin123</code>
-            </div>
 
             <div>
               <label htmlFor="username" className="block text-sm font-medium text-gray-700">

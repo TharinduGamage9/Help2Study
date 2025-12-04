@@ -141,7 +141,7 @@ export default function ALPage() {
             ))}
           </div>
         ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {notes.map((note) => (
               <div
                 key={note._id}

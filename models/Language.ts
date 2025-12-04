@@ -27,4 +27,3 @@ const LanguageSchema: Schema = new Schema(
 
 export default mongoose.models.Language || mongoose.model<ILanguage>('Language', LanguageSchema);
 
-

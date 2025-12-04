@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Note {
   _id: string;
@@ -55,23 +55,8 @@ interface Grade5Course {
   driveLink: string;
 }
 
-interface VisitorStats {
-  totalVisits: number;
-  uniqueVisitors: number;
-  visitsByPage: Array<{ _id: string; count: number }>;
-  recentVisits: Array<{ ip: string; page: string; timestamp: string; userAgent?: string }>;
-  visitsByDay: Array<{ date: string; count: number; unique: number }>;
-  period: string;
-}
-
-interface LiveVisitorData {
-  liveCount: number;
-  activeSessions: Array<{ sessionId: string; ip: string; page: string; lastSeen: string }>;
-  sessionsByPage: Record<string, number>;
-}
-
 export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
-  const [activeTab, setActiveTab] = useState<'notes' | 'otherNotes' | 'nvq' | 'psychology' | 'bcom' | 'languages' | 'baExternal' | 'grade5' | 'visitors'>('notes');
+  const [activeTab, setActiveTab] = useState<'notes' | 'otherNotes' | 'nvq' | 'psychology' | 'bcom' | 'languages' | 'baExternal' | 'grade5'>('notes');
   const [notes, setNotes] = useState<Note[]>([]);
   const [otherNotes, setOtherNotes] = useState<OtherNote[]>([]);
   const [nvqCourses, setNvqCourses] = useState<NVQCourse[]>([]);
@@ -80,9 +65,6 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [languages, setLanguages] = useState<LanguageCourse[]>([]);
   const [baExternalCourses, setBaExternalCourses] = useState<BAExternalCourse[]>([]);
   const [grade5Courses, setGrade5Courses] = useState<Grade5Course[]>([]);
-  const [visitorStats, setVisitorStats] = useState<VisitorStats | null>(null);
-  const [liveVisitors, setLiveVisitors] = useState<LiveVisitorData | null>(null);
-  const [statsPeriod, setStatsPeriod] = useState<'today' | 'week' | 'month' | 'all'>('all');
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState<Note | OtherNote | NVQCourse | PsychologyCourse | BComCourse | LanguageCourse | BAExternalCourse | Grade5Course | null>(null);
@@ -106,42 +88,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     fetchLanguages();
     fetchBAExternal();
     fetchGrade5();
-    fetchVisitorStats();
-  }, [fetchVisitorStats]);
-
-  useEffect(() => {
-    if (activeTab === 'visitors') {
-      fetchVisitorStats();
-      fetchLiveVisitors();
-      
-      // Auto-refresh live visitors every 5 seconds
-      const interval = setInterval(() => {
-        fetchLiveVisitors();
-      }, 5000);
-
-      return () => clearInterval(interval);
-    }
-  }, [statsPeriod, activeTab, fetchVisitorStats]);
-
-  const fetchLiveVisitors = async () => {
-    try {
-      const response = await fetch('/api/visitors/live');
-      const data = await response.json();
-      setLiveVisitors(data);
-    } catch (error) {
-      console.error('Error fetching live visitors:', error);
-    }
-  };
-
-  const fetchVisitorStats = useCallback(async () => {
-    try {
-      const response = await fetch(`/api/visitors/stats?period=${statsPeriod}`);
-      const data = await response.json();
-      setVisitorStats(data);
-    } catch (error) {
-      console.error('Error fetching visitor stats:', error);
-    }
-  }, [statsPeriod]);
+  }, []);
 
   const fetchGrade5 = async () => {
     try {
@@ -454,6 +401,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         driveLink: item.driveLink,
         level: 'OL',
         category: item.category,
+        noteCategory: '',
         year: '1st Year',
         medium: '',
       });
@@ -463,6 +411,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         driveLink: item.driveLink,
         level: 'OL',
         category: '',
+        noteCategory: '',
         year: item.year,
         medium: '',
       });
@@ -472,6 +421,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         driveLink: item.driveLink,
         level: 'OL',
         category: '',
+        noteCategory: '',
         year: '1st Year',
         medium: item.medium,
       });
@@ -481,6 +431,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         driveLink: item.driveLink,
         level: 'OL',
         category: '',
+        noteCategory: '',
         year: '1st Year',
         medium: '',
       });
@@ -510,8 +461,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
     if (activeTab === 'bcom') return 'B Com Course';
     if (activeTab === 'languages') return 'Language';
     if (activeTab === 'baExternal') return 'BA External Course';
-    if (activeTab === 'grade5') return 'Grade 5 Course';
-    return 'Visitor';
+    return 'Grade 5 Course';
   };
 
   const categories = ['ICT', 'Construction & Engineering Technology', 'Automotive Technology', 'Hospitality & Tourism', 'Healthcare & Social Care'];
@@ -640,16 +590,14 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
           </div>
 
           <div className="p-6">
-            {activeTab !== 'visitors' && (
-              <button
-                onClick={() => setShowForm(!showForm)}
-                className="mb-4 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
-              >
-                {showForm ? 'Cancel' : `Add New ${getTabLabel()}`}
-              </button>
-            )}
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="mb-4 bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700"
+            >
+              {showForm ? 'Cancel' : `Add New ${getTabLabel()}`}
+            </button>
 
-            {showForm && activeTab !== 'visitors' && (
+            {showForm && (
               <form onSubmit={handleSubmit} className="mb-8 bg-gray-50 p-6 rounded-lg">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -780,9 +728,8 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
               </form>
             )}
 
-            {activeTab !== 'visitors' && (
-              <div className="space-y-4">
-                {activeTab === 'notes' ? (
+            <div className="space-y-4">
+              {activeTab === 'notes' ? (
                 notes.length === 0 ? (
                   <p className="text-gray-500">No notes found. Add your first note!</p>
                 ) : (
@@ -807,7 +754,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                             rel="noopener noreferrer"
                             className="text-indigo-600 hover:text-indigo-800 text-sm inline-block"
                           >
-                            View Drive Link →
+                            View Drive Link {'>'}
                           </a>
                         </div>
                         <div className="flex gap-2 ml-4">
@@ -843,7 +790,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                             rel="noopener noreferrer"
                             className="text-indigo-600 hover:text-indigo-800 text-sm inline-block"
                           >
-                            View Drive Link →
+                            View Drive Link {'>'}
                           </a>
                         </div>
                         <div className="flex gap-2 ml-4">
@@ -884,7 +831,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                             rel="noopener noreferrer"
                             className="text-indigo-600 hover:text-indigo-800 text-sm inline-block"
                           >
-                            View Drive Link →
+                            View Drive Link {'>'}
                           </a>
                         </div>
                         <div className="flex gap-2 ml-4">
@@ -920,7 +867,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                             rel="noopener noreferrer"
                             className="text-indigo-600 hover:text-indigo-800 text-sm inline-block"
                           >
-                            View Drive Link →
+                            View Drive Link {'>'}
                           </a>
                         </div>
                         <div className="flex gap-2 ml-4">
@@ -961,7 +908,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                             rel="noopener noreferrer"
                             className="text-indigo-600 hover:text-indigo-800 text-sm inline-block"
                           >
-                            View Drive Link →
+                            View Drive Link {'>'}
                           </a>
                         </div>
                         <div className="flex gap-2 ml-4">
@@ -997,7 +944,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                             rel="noopener noreferrer"
                             className="text-indigo-600 hover:text-indigo-800 text-sm inline-block"
                           >
-                            View Drive Link →
+                            View Drive Link {'>'}
                           </a>
                         </div>
                         <div className="flex gap-2 ml-4">
@@ -1038,7 +985,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                             rel="noopener noreferrer"
                             className="text-indigo-600 hover:text-indigo-800 text-sm inline-block"
                           >
-                            View Drive Link →
+                            View Drive Link {'>'}
                           </a>
                         </div>
                         <div className="flex gap-2 ml-4">
@@ -1074,7 +1021,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                             rel="noopener noreferrer"
                             className="text-indigo-600 hover:text-indigo-800 text-sm inline-block"
                           >
-                            View Drive Link →
+                            View Drive Link {'>'}
                           </a>
                         </div>
                         <div className="flex gap-2 ml-4">
@@ -1095,221 +1042,8 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
                     </div>
                   ))
                 )
-                )}
-              </div>
-            )}
-
-            {activeTab === 'visitors' && (
-                <div className="p-6">
-                  <div className="mb-6 flex justify-between items-center">
-                    <h2 className="text-2xl font-bold text-gray-900">Visitor Statistics</h2>
-                    <select
-                      value={statsPeriod}
-                      onChange={(e) => setStatsPeriod(e.target.value as 'today' | 'week' | 'month' | 'all')}
-                      className="px-4 py-2 border border-gray-300 rounded-md bg-white"
-                    >
-                      <option value="today">Today</option>
-                      <option value="week">Last 7 Days</option>
-                      <option value="month">Last 30 Days</option>
-                      <option value="all">All Time</option>
-                    </select>
-                  </div>
-
-                  {/* Live Visitors Card */}
-                  <div className="mb-6">
-                    <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg p-6 text-white shadow-lg">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-sm font-medium opacity-90 mb-1">Live Visitors Now</div>
-                          <div className="text-5xl font-bold">
-                            {liveVisitors?.liveCount ?? 0}
-                          </div>
-                          <div className="text-sm opacity-75 mt-2">
-                            Active in the last 5 minutes
-                          </div>
-                        </div>
-                        <div className="text-6xl opacity-20">
-                          👥
-                        </div>
-                      </div>
-                      {liveVisitors && liveVisitors.liveCount > 0 && (
-                        <div className="mt-4 pt-4 border-t border-white/20">
-                          <div className="text-sm font-medium mb-2">Currently viewing:</div>
-                          <div className="flex flex-wrap gap-2">
-                            {Object.entries(liveVisitors.sessionsByPage).map(([page, count]) => (
-                              <div key={page} className="bg-white/20 px-3 py-1 rounded-full text-xs">
-                                {page === '/' ? 'Home' : page}: {count}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Live Visitors Card */}
-                  <div className="mb-6">
-                    <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg p-6 text-white shadow-lg">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <div className="text-sm font-medium opacity-90 mb-1">Live Visitors Now</div>
-                          <div className="text-5xl font-bold">
-                            {liveVisitors?.liveCount ?? 0}
-                          </div>
-                          <div className="text-sm opacity-75 mt-2">
-                            Active in the last 5 minutes
-                          </div>
-                        </div>
-                        <div className="text-6xl opacity-20">
-                          👥
-                        </div>
-                      </div>
-                      {liveVisitors && liveVisitors.liveCount > 0 && (
-                        <div className="mt-4 pt-4 border-t border-white/20">
-                          <div className="text-sm font-medium mb-2">Currently viewing:</div>
-                          <div className="flex flex-wrap gap-2">
-                            {Object.entries(liveVisitors.sessionsByPage).map(([page, count]) => (
-                              <div key={page} className="bg-white/20 px-3 py-1 rounded-full text-xs">
-                                {page === '/' ? 'Home' : page}: {count}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {visitorStats ? (
-                    <div className="space-y-6">
-                      {/* Statistics Cards */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white">
-                          <div className="text-sm font-medium opacity-90">Total Visits</div>
-                          <div className="text-4xl font-bold mt-2">{visitorStats.totalVisits.toLocaleString()}</div>
-                        </div>
-                        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white">
-                          <div className="text-sm font-medium opacity-90">Unique Visitors</div>
-                          <div className="text-4xl font-bold mt-2">{visitorStats.uniqueVisitors.toLocaleString()}</div>
-                        </div>
-                      </div>
-
-                      {/* Visits by Page */}
-                      <div className="bg-white border border-gray-200 rounded-lg p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Pages</h3>
-                        {visitorStats.visitsByPage.length > 0 ? (
-                          <div className="space-y-3">
-                            {visitorStats.visitsByPage.map((page) => (
-                              <div key={page._id} className="flex justify-between items-center">
-                                <span className="text-gray-700">{page._id === '/' ? 'Home' : page._id}</span>
-                                <span className="font-semibold text-indigo-600">{page.count.toLocaleString()} visits</span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className="text-gray-500">No page visits yet</p>
-                        )}
-                      </div>
-
-                      {/* Active Sessions */}
-                      {liveVisitors && liveVisitors.activeSessions.length > 0 && (
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-4">Active Sessions (Live)</h3>
-                          <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                              <thead className="bg-gray-50">
-                                <tr>
-                                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP Address</th>
-                                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Page</th>
-                                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Last Active</th>
-                                </tr>
-                              </thead>
-                              <tbody className="bg-white divide-y divide-gray-200">
-                                {liveVisitors.activeSessions.map((session) => {
-                                  const lastSeen = new Date(session.lastSeen);
-                                  const secondsAgo = Math.floor((Date.now() - lastSeen.getTime()) / 1000);
-                                  return (
-                                    <tr key={session.sessionId}>
-                                      <td className="px-4 py-3 text-sm text-gray-900">{session.ip}</td>
-                                      <td className="px-4 py-3 text-sm text-gray-600">{session.page === '/' ? 'Home' : session.page}</td>
-                                      <td className="px-4 py-3 text-sm text-gray-500">
-                                        {secondsAgo < 60 ? `${secondsAgo}s ago` : `${Math.floor(secondsAgo / 60)}m ago`}
-                                      </td>
-                                    </tr>
-                                  );
-                                })}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Recent Visits */}
-                      <div className="bg-white border border-gray-200 rounded-lg p-6">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Visits (Historical)</h3>
-                        {visitorStats.recentVisits.length > 0 ? (
-                          <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                              <thead className="bg-gray-50">
-                                <tr>
-                                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP Address</th>
-                                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Page</th>
-                                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
-                                </tr>
-                              </thead>
-                              <tbody className="bg-white divide-y divide-gray-200">
-                                {visitorStats.recentVisits.map((visit, index) => (
-                                  <tr key={index}>
-                                    <td className="px-4 py-3 text-sm text-gray-900">{visit.ip}</td>
-                                    <td className="px-4 py-3 text-sm text-gray-600">{visit.page === '/' ? 'Home' : visit.page}</td>
-                                    <td className="px-4 py-3 text-sm text-gray-500">
-                                      {new Date(visit.timestamp).toLocaleString()}
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          </div>
-                        ) : (
-                          <p className="text-gray-500">No recent visits</p>
-                        )}
-                      </div>
-
-                      {/* Daily Visits Chart */}
-                      {visitorStats.visitsByDay.length > 0 && (
-                        <div className="bg-white border border-gray-200 rounded-lg p-6">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-4">Daily Visits</h3>
-                          <div className="space-y-2">
-                            {visitorStats.visitsByDay.map((day) => (
-                              <div key={day.date} className="flex items-center">
-                                <div className="w-24 text-sm text-gray-600">{day.date}</div>
-                                <div className="flex-1 mx-4">
-                                  <div className="bg-gray-200 rounded-full h-6 relative">
-                                    <div
-                                      className="bg-indigo-600 h-6 rounded-full flex items-center justify-end pr-2"
-                                      style={{
-                                        width: `${Math.min((day.count / Math.max(...visitorStats.visitsByDay.map(d => d.count))) * 100, 100)}%`,
-                                      }}
-                                    >
-                                      <span className="text-xs text-white font-medium">{day.count}</span>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="w-20 text-sm text-gray-600 text-right">
-                                  {day.unique} unique
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12">
-                      <p className="text-gray-500">Loading visitor statistics...</p>
-                    </div>
-                  )}
-                </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

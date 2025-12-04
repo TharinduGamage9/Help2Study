@@ -33,4 +33,3 @@ const BComSchema: Schema = new Schema(
 
 export default mongoose.models.BCom || mongoose.model<IBCom>('BCom', BComSchema);
 
-
