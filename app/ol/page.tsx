@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { formatDriveLink } from '@/lib/driveLinkUtils';
 
 interface Note {
   _id: string;
@@ -87,7 +88,7 @@ export default function OLPage() {
                       {note.subject}
                     </h3>
                     <a
-                      href={note.driveLink}
+                      href={formatDriveLink(note.driveLink)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition inline-block"

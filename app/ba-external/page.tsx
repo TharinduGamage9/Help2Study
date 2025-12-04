@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { formatDriveLink } from '@/lib/driveLinkUtils';
 
 interface BAExternalCourse {
   _id: string;
@@ -122,7 +123,7 @@ export default function BAExternalPage() {
                         <h3 className="text-lg font-semibold text-gray-900">{course.medium}</h3>
                       </div>
                       <a
-                        href={course.driveLink}
+                        href={formatDriveLink(course.driveLink)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bg-amber-600 text-white px-4 py-2 rounded hover:bg-amber-700 transition inline-block w-full text-center"

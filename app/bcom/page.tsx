@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { formatDriveLink } from '@/lib/driveLinkUtils';
 
 interface BComCourse {
   _id: string;
@@ -119,7 +120,7 @@ export default function BComPage() {
                         {course.subject}
                       </h3>
                       <a
-                        href={course.driveLink}
+                        href={formatDriveLink(course.driveLink)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="bg-teal-600 text-white px-4 py-2 rounded hover:bg-teal-700 transition inline-block"

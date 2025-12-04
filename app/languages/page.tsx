@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { formatDriveLink } from '@/lib/driveLinkUtils';
 
 interface Language {
   _id: string;
@@ -85,7 +86,7 @@ export default function LanguagesPage() {
                   {language.subject}
                 </h3>
                 <a
-                  href={language.driveLink}
+                  href={formatDriveLink(language.driveLink)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition inline-block w-full text-center"

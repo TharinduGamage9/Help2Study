@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { formatDriveLink } from '@/lib/driveLinkUtils';
 
 interface PsychologyCourse {
   _id: string;
@@ -82,7 +83,7 @@ export default function PsychologyPage() {
                   {course.subject}
                 </h3>
                 <a
-                  href={course.driveLink}
+                  href={formatDriveLink(course.driveLink)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 transition inline-block"
