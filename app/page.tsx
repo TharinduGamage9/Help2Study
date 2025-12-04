@@ -9,14 +9,14 @@ export default function Home() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
-            <Image
+            {/* <Image
               src="/logo.png"
               alt="Help2Study Logo"
               width={150}
               height={150}
               className="object-contain"
               priority
-            />
+            /> */}
           </div>
           <h1 className="text-5xl font-bold text-gray-900 mb-4">
             Welcome to Help2Study
