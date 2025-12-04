@@ -13,10 +13,6 @@ export default function PsychologyPage() {
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchPsychology();
-  }, [selectedSubject]);
-
   const fetchPsychology = async () => {
     setLoading(true);
     try {
@@ -33,6 +29,10 @@ export default function PsychologyPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchPsychology();
+  }, [selectedSubject]);
 
   const subjects = Array.from(
     new Set(psychologyCourses.map((c) => c.subject))

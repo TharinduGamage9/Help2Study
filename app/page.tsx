@@ -22,7 +22,7 @@ export default function Home() {
             Welcome to Help2Study
           </h1>
           <p className="text-xl text-gray-600">
-            All study materials in one place. Don't give up, keep going on your journey.
+            All study materials in one place. Don&apos;t give up, keep going on your journey.
           </p>
         </div>
 
