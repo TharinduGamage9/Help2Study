@@ -109,3 +109,4 @@ async function updateALCategories() {
 updateALCategories();
 
 
+

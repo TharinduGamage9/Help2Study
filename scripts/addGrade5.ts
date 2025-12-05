@@ -21,7 +21,10 @@ interface Grade5Data {
 }
 
 const grade5Courses: Grade5Data[] = [
+  { subject: 'ගණිතය (Mathematics)', driveLink: 'https://drive.google.com/drive/folders/1xzv3iwfPpitgQfS73HFTlyHe9yDLu1Yn?usp=drive_link' },
+  { subject: 'පරිසරය (Environment)', driveLink: 'https://drive.google.com/drive/folders/1ZS0sLN0fNN9KNI7SJo8m5K9OEZlbvHRp?usp=drive_link' },
   { subject: 'සිංහල (Sinhala)', driveLink: 'https://drive.google.com/drive/folders/1Ebg33an0jpv9rkklDHA1bbuv7ne86_4S?usp=drive_link' },
+  { subject: 'දෙමළ (Tamil)', driveLink: 'https://drive.google.com/drive/folders/11RD7aw3exAj-CsrUIyP3XeeIBmw7ZRSO?usp=drive_link' },
 ];
 
 async function addGrade5() {
