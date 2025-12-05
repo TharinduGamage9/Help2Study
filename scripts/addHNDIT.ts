@@ -28,6 +28,12 @@ interface HNDITData {
 }
 
 const hnditCourses: HNDITData[] = [
+  // 1st Year 1st Semester - from provided link
+  {
+    subject: '1st Year 1st Semester - All Notes',
+    driveLink: 'https://drive.google.com/drive/folders/1Xuj2c2eO1MXgZGWe2r-3GnHbPD-TiNp2',
+    semester: '1st Year 1st Semester',
+  },
   // 2nd Year 1st Semester - from provided link
   {
     subject: '2nd Year 1st Semester - All Notes',

@@ -21,10 +21,7 @@ interface Grade5Data {
 }
 
 const grade5Courses: Grade5Data[] = [
-  { subject: 'ගණිතය (Mathematics)', driveLink: 'https://drive.google.com/file/d/1xzv3iwfPpitgQfS73HFTlyHe9yD/view?usp=drive_link' },
-  { subject: 'පරිසරය (Environment)', driveLink: 'https://drive.google.com/file/d/1ZS0sLN0fNN9KNI7SJo8m5K9OEZl/view?usp=drive_link' },
-  { subject: 'සිංහල (Sinhala)', driveLink: 'https://drive.google.com/file/d/1Ebg33an0jpv9rkklDHA1bbuv7ne/view?usp=drive_link' },
-  { subject: 'දෙමළ (Tamil)', driveLink: 'https://drive.google.com/file/d/11RD7aw3exAj/view?usp=drive_link' },
+  { subject: 'සිංහල (Sinhala)', driveLink: 'https://drive.google.com/drive/folders/1Ebg33an0jpv9rkklDHA1bbuv7ne86_4S?usp=drive_link' },
 ];
 
 async function addGrade5() {
@@ -37,23 +34,15 @@ async function addGrade5() {
     await mongoose.connect(MONGODB_URI);
     console.log('Connected to MongoDB');
 
+    // Delete all existing Grade 5 courses
+    const deleteResult = await Grade5.deleteMany({});
+    console.log(`\n🗑️  Deleted ${deleteResult.deletedCount} existing Grade 5 courses`);
+
     let added = 0;
     let skipped = 0;
 
     for (const courseData of grade5Courses) {
       try {
-        // Check if this exact combination already exists
-        const existing = await Grade5.findOne({
-          subject: courseData.subject,
-          driveLink: courseData.driveLink,
-        });
-
-        if (existing) {
-          console.log(`Skipping duplicate: ${courseData.subject}`);
-          skipped++;
-          continue;
-        }
-
         const course = new Grade5({
           subject: courseData.subject,
           driveLink: courseData.driveLink,
@@ -73,6 +62,7 @@ async function addGrade5() {
     }
 
     console.log('\n=== Summary ===');
+    console.log(`Deleted: ${deleteResult.deletedCount} old courses`);
     console.log(`Added: ${added} Grade 5 courses`);
     console.log(`Skipped: ${skipped} duplicates`);
     console.log(`Total: ${grade5Courses.length} courses`);

@@ -183,7 +183,7 @@ export default function HNDITPage() {
                 </h3>
                 <p className="text-sm text-gray-600 mb-4">{course.semester}</p>
                 <a
-                  href={course.driveLink}
+                  href={formatDriveLink(course.driveLink)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition inline-block"
