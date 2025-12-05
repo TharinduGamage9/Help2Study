@@ -25,31 +25,46 @@ export function formatDriveLink(link: string): string {
       }
     }
     
-    // For file links
+    // For file links - handle /file/d/ID, /file/d/ID/view, /file/d/ID/preview, /file/d/ID/edit
     if (url.pathname.includes('/file/d/')) {
-      // Extract file ID
+      // Extract file ID (captures ID even if followed by /view, /preview, /edit, etc.)
       const fileMatch = url.pathname.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
       if (fileMatch) {
         const fileId = fileMatch[1];
-        // Return properly formatted file link
+        // Use /view format for standard compatibility - works for PDFs and all file types
+        // This format ensures files open correctly in Google Drive viewer
         return `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;
       }
     }
 
-    // For open?id= format (legacy)
+    // For open?id= format (legacy) - this format works for both files and folders
     if (url.searchParams.has('id')) {
       const id = url.searchParams.get('id');
       if (id) {
-        // Try folder format first
-        return `https://drive.google.com/drive/folders/${id}?usp=sharing`;
+        // Keep the open?id= format as it works for both files and folders
+        // Just ensure sharing parameter is present
+        return `https://drive.google.com/open?id=${id}&usp=sharing`;
       }
     }
 
     // If it's already a valid Google Drive URL, ensure it has sharing parameter
     if (url.hostname === 'drive.google.com') {
-      if (!url.searchParams.has('usp')) {
+      // Clean up the URL - remove any trailing slashes or unwanted path segments
+      if (url.pathname.endsWith('/') && url.pathname.length > 1) {
+        url.pathname = url.pathname.slice(0, -1);
+      }
+      
+      // Normalize usp parameter - replace drive_link with sharing for better compatibility
+      if (url.searchParams.has('usp')) {
+        const uspValue = url.searchParams.get('usp');
+        if (uspValue === 'drive_link') {
+          url.searchParams.set('usp', 'sharing');
+        }
+      } else {
+        // Ensure sharing parameter is present
         url.searchParams.set('usp', 'sharing');
       }
+      
       return url.toString();
     }
 
